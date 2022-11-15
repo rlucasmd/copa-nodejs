@@ -4,7 +4,7 @@ import { prisma } from '../lib/prisma';
 import z, { string } from 'zod';
 import { verify as jwtverify, } from 'jsonwebtoken';
 import 'dotenv/config';
-import { verifyJwt } from '../middleware/verifivyJwt';
+import { verifyJwt } from '../middleware/verifyJwt';
 
 const SECRET = process.env.ENCRYPT_HASH!;
 
@@ -76,7 +76,7 @@ routes.post('/pools', async (req: Request, res: Response, next: NextFunction) =>
   return res.status(201).json({ code });
 });
 
-routes.post('/pools/:id/join', verifyJwt, async (req: Request, res: Response) => {
+routes.post('/pools/join', verifyJwt, async (req: Request, res: Response) => {
   const joinPoolBody = z.object({
     code: z.string()
   });
@@ -122,6 +122,80 @@ routes.post('/pools/:id/join', verifyJwt, async (req: Request, res: Response) =>
 
   return res.sendStatus(201);
 
+});
+
+routes.get('/pools', verifyJwt, async (req: Request, res: Response) => {
+  const pools = await prisma.pool.findMany({
+    where: {
+      participants: {
+        some: {
+          userId: req.user.sub
+        }
+      }
+    },
+    include: {
+      _count: {
+        select: { participants: true }
+      },
+      participants: {
+        select: {
+          id: true,
+
+          user: {
+            select: {
+              avatarUrl: true
+            }
+          }
+        },
+        take: 4
+      },
+      owner: {
+        select: {
+          name: true,
+          id: true
+        }
+      }
+    }
+  });
+  res.status(201).json({ pools });
+});
+
+routes.get('/pools/:id', verifyJwt, async (req: Request, res: Response) => {
+  const getPoolParams = z.object({
+    id: z.string()
+  });
+
+  const { id } = getPoolParams.parse(req.params);
+
+  const pool = await prisma.pool.findUnique({
+    where: {
+      id
+    },
+    include: {
+      _count: {
+        select: { participants: true }
+      },
+      participants: {
+        select: {
+          id: true,
+
+          user: {
+            select: {
+              avatarUrl: true
+            }
+          }
+        },
+        take: 4
+      },
+      owner: {
+        select: {
+          name: true,
+          id: true
+        }
+      }
+    }
+  });
+  return res.status(200).json({ pool });
 });
 
 export default routes;

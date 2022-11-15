@@ -12,20 +12,21 @@ interface user {
 async function verifyJwt(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
-    throw new Error('Error: missing jwt!');
+    return res.status(401).json({ message: 'Missing token' })
   }
 
   try {
     const decode = jwt.verify(token, SECRET);
     if (!decode)
-      throw new Error('Error: malformed jwt');
+      return res.status(401).send({ message: 'Token malformed' })
 
     //console.log(decode);
     const { sub, avatarUrl, name } = jwt.verify(token, SECRET) as user;
     req.userId = sub;
     req.user = { sub, avatarUrl, name };
   } catch (err) {
-    throw new Error('Error');
+    console.log(err);
+    return res.status(401).send({ message: 'token error' })
   }
   next();
 }

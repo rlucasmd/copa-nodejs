@@ -3,7 +3,7 @@ import { Router, Request, Response, application } from 'express';
 import { prisma } from '../lib/prisma';
 import 'dotenv/config';
 import jwt from 'jsonwebtoken';
-import { verifyJwt } from '../middleware/verifivyJwt';
+import { verifyJwt } from '../middleware/verifyJwt';
 
 const routes = Router();
 
@@ -60,6 +60,7 @@ routes.post('/users', async (req: Request, res: Response) => {
   )
 });
 routes.get('/me', verifyJwt, async (req: Request, res: Response) => {
+  console.log(req.user);
   res.sendStatus(200);
 });
 
