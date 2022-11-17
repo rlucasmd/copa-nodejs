@@ -44,9 +44,9 @@ routes.post('/pools/:poolId/games/:gameId/guesses', verifyJwt, async (req: Reque
       }
     }
   });
-  if (!guess) {
+  if (guess !== null)
     return res.status(400).json({ message: "You already sent guess to this game on this pool." })
-  }
+
 
   const game = await prisma.game.findUnique({
     where: {
@@ -68,7 +68,7 @@ routes.post('/pools/:poolId/games/:gameId/guesses', verifyJwt, async (req: Reque
     }
   });
 
-  return res.status(201);
+  return res.sendStatus(201);
 
 });
 

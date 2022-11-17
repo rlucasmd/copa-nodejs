@@ -60,8 +60,8 @@ routes.post('/users', async (req: Request, res: Response) => {
   )
 });
 routes.get('/me', verifyJwt, async (req: Request, res: Response) => {
-  console.log(req.user);
-  res.sendStatus(200);
+  const user = req.user;
+  res.status(200).json({ user });
 });
 
 
