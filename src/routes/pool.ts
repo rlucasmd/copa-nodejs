@@ -81,7 +81,8 @@ routes.post('/pools/join', verifyJwt, async (req: Request, res: Response) => {
     code: z.string()
   });
 
-  const { code } = joinPoolBody.parse(req.body);
+  let { code } = joinPoolBody.parse(req.body);
+  code = code.toUpperCase();
   const pool = await prisma.pool.findUnique({
     where: { code },
     include: {
