@@ -33,7 +33,7 @@ routes.get('/pools/:id/games', verifyJwt, async (req: Request, res: Response) =>
     return {
       ...game,
       guess: game.guesses.length > 0 ? game.guesses[0] : null,
-      //guesses: undefined
+      guesses: undefined
     }
   });
 
